@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gemini Chatbot</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+    .chat-box { max-width: 600px; margin: auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .messages { height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+    .user { color: blue; margin: 5px 0; }
+    .bot { color: green; margin: 5px 0; }
+    input, button { padding: 10px; }
+    input { width: 70%; }
+    button { width: 25%; }
+  </style>
+</head>
+<body>
+  <div class="chat-box">
+    <h2>🤖 Gemini Chatbot</h2>
+    <div class="messages" id="messages"></div>
+    <input type="text" id="userInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    const backendURL = "https://ac428cd2ec27.ngrok-free.app/chat"; // replace with your Colab ngrok URL
+
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const msgBox = document.getElementById("messages");
+
+      const userMessage = input.value.trim();
+      if (!userMessage) return;
+
+      // Show user message
+      msgBox.innerHTML += `<div class="user"><b>You:</b> ${userMessage}</div>`;
+      input.value = "";
+
+      // Send to backend
+      try {
+        const response = await fetch(backendURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage })
+        });
+
+        const data = await response.json();
+        msgBox.innerHTML += `<div class="bot"><b>Bot:</b> ${data.reply}</div>`;
+        msgBox.scrollTop = msgBox.scrollHeight; // auto scroll
+      } catch (error) {
+        msgBox.innerHTML += `<div class="bot"><b>Bot:</b> Error connecting to server</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
